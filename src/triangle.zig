@@ -4,7 +4,7 @@ const sg = sokol.gfx;
 const sapp = sokol.app;
 const sglue = sokol.glue;
 const print = @import("std").debug.print;
-const shd = @import("shaders/2-quad.glsl.zig");
+const shd = @import("shaders/3-quad-wireframe.glsl.zig");
 
 const state = struct {
     var bind: sg.Bindings = .{};
@@ -19,15 +19,16 @@ export fn init() void {
     });
 
     state.bind.vertex_buffers[0] = sg.makeBuffer(.{ .data = sg.asRange(&[_]f32{ 0.5, 0.5, 0.0, 0.5, -0.5, 0.0, -0.5, -0.5, 0.0, -0.5, 0.5, 0.0 }) });
-    state.bind.index_buffer = sg.makeBuffer(.{ .type = .INDEXBUFFER, .data = sg.asRange(&[_]u16{ 0, 1, 3, 1, 2, 3 }) });
+    state.bind.index_buffer = sg.makeBuffer(.{ .type = .INDEXBUFFER, .data = sg.asRange(&[_]u16{ 0, 1, 1, 3, 3, 0, 1, 2, 2, 3, 3, 1 }) });
 
     var pip_desc: sg.PipelineDesc = .{ .shader = sg.makeShader(shd.simpleShaderDesc(sg.queryBackend())), .index_type = .UINT16 };
     pip_desc.layout.attrs[shd.ATTR_vs_position].format = .FLOAT3;
+    pip_desc.primitive_type = .LINES;
     state.pip = sg.makePipeline(pip_desc);
 
     state.pass_action.colors[0] = .{
         .load_action = .CLEAR,
-        .clear_value = .{ .r = 0, .g = 0, .b = 0, .a = 1 },
+        .clear_value = .{ .r = 0.2, .g = 0.3, .b = 0.3, .a = 1 },
     };
 
     print("Backend {}\n", .{sg.queryBackend()});
@@ -37,7 +38,7 @@ export fn frame() void {
     sg.beginPass(.{ .action = state.pass_action, .swapchain = sglue.swapchain() });
     sg.applyPipeline(state.pip);
     sg.applyBindings(state.bind);
-    sg.draw(0, 6, 1);
+    sg.draw(0, 12, 1);
     sg.endPass();
     sg.commit();
 }
