@@ -8,7 +8,7 @@ pub fn build(b: *Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const examples: [6]exampleBuildConfig = .{ .{
+    const examples: [7]exampleBuildConfig = .{ .{
         .name = "in-out",
         .path = "src/1-5-shaders/1-in-out.zig",
     }, .{
@@ -26,6 +26,9 @@ pub fn build(b: *Build) !void {
     }, .{
         .name = "texture",
         .path = "src/1-6-textures/1-texture.zig",
+    }, .{
+        .name = "texture-blend",
+        .path = "src/1-6-textures/2-texture-blend.zig",
     } };
 
     inline for (examples) |example| {

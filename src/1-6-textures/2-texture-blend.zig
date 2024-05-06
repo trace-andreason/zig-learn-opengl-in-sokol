@@ -5,7 +5,7 @@ const sapp = sokol.app;
 const sglue = sokol.glue;
 const stime = sokol.time;
 const print = @import("std").debug.print;
-const shd = @import("1-texture.glsl.zig");
+const shd = @import("2-texture-blend.glsl.zig");
 const std = @import("std");
 const c = @cImport({
     @cInclude("stb_image.h");
