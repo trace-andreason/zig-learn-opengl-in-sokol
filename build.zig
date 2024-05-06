@@ -8,7 +8,7 @@ pub fn build(b: *Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const examples: [5]exampleBuildConfig = .{ .{
+    const examples: [6]exampleBuildConfig = .{ .{
         .name = "in-out",
         .path = "src/1-5-shaders/1-in-out.zig",
     }, .{
@@ -23,6 +23,9 @@ pub fn build(b: *Build) !void {
     }, .{
         .name = "hello",
         .path = "src/hello.zig",
+    }, .{
+        .name = "texture",
+        .path = "src/1-6-textures/1-texture.zig",
     } };
 
     inline for (examples) |example| {
@@ -41,6 +44,14 @@ fn buildExample(b: *Build, comptime conf: exampleBuildConfig, target: ResolvedTa
         .target = target,
         .optimize = optimize,
         .root_source_file = b.path(conf.path),
+    });
+    triangle.addCSourceFile(.{
+        .file = .{
+            .path = "src/stb_image.c",
+        },
+    });
+    triangle.addIncludePath(.{
+        .path = "src/",
     });
     const dep_sokol = b.dependency("sokol", .{
         .target = target,

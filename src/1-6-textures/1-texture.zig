@@ -5,7 +5,11 @@ const sapp = sokol.app;
 const sglue = sokol.glue;
 const stime = sokol.time;
 const print = @import("std").debug.print;
-const shd = @import("3-attributes.glsl.zig");
+const shd = @import("1-texture.glsl.zig");
+const std = @import("std");
+const c = @cImport({
+    @cInclude("stb_image.h");
+});
 
 const state = struct {
     var bind: sg.Bindings = .{};
@@ -19,14 +23,53 @@ export fn init() void {
         .logger = .{ .func = slog.func },
     });
 
-    // initialize sokol_time
-    stime.stm_setup();
+    //const allocator = std.heap.page_allocator();
 
-    state.bind.vertex_buffers[0] = sg.makeBuffer(.{ .data = sg.asRange(&[_]f32{ 0.5, -0.5, 0.0, 1.0, 0.0, 0.0, -0.5, -0.5, 0, 0.0, 1.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 1.0 }) });
+    // Specify the path to your JPEG file
+    const img_path = "./src/1-6-textures/brickwall.jpg";
+
+    // Load the image
+    var x: c_int = 0;
+    var y: c_int = 0;
+    var channels_in_file: c_int = 0;
+
+    const data = c.stbi_load(img_path, &x, &y, &channels_in_file, 4);
+    if (data == null) {
+        std.log.err("Failed to load image", .{});
+        return;
+    }
+    defer c.stbi_image_free(data);
+    const width: usize = @intCast(x);
+    const height: usize = @intCast(y);
+    const img_size = width * height * 4; // 3 for RGB
+
+    var img_desc: sg.ImageDesc = .{ .width = x, .height = y, .pixel_format = .RGBA8 };
+    img_desc.data.subimage[0][0] = .{
+        .ptr = data,
+        .size = img_size,
+    };
+    state.bind.fs.images[shd.SLOT__ourTexture] = sg.makeImage(img_desc);
+
+    //sg.initImage(state.bind.fs.images[shd.SLOT__ourTexture], img_desc);
+    state.bind.fs.samplers[shd.SLOT_ourTexture_smp] = sg.makeSampler(.{});
+    state.bind.vertex_buffers[0] = sg.makeBuffer(.{
+        .data = sg.asRange(&[_]f32{
+            // positions     //colors       //texture coordinates
+            0.5,  0.5,  0.0, 1.0, 0.0, 0.0, 1.0, 1.0,
+            0.5,  -0.5, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0,
+            -0.5, -0.5, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+            -0.5, 0.5,  0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
+        }),
+    });
+
+    state.bind.index_buffer = sg.makeBuffer(.{ .type = .INDEXBUFFER, .data = sg.asRange(&[_]u16{ 0, 1, 3, 1, 2, 3 }) });
 
     var pip_desc: sg.PipelineDesc = .{ .shader = sg.makeShader(shd.simpleShaderDesc(sg.queryBackend())) };
     pip_desc.layout.attrs[shd.ATTR_vs_position].format = .FLOAT3;
     pip_desc.layout.attrs[shd.ATTR_vs_aColor].format = .FLOAT3;
+    pip_desc.layout.attrs[shd.ATTR_vs_aTexCoord].format = .FLOAT2;
+    pip_desc.index_type = .UINT16;
+
     state.pip = sg.makePipeline(pip_desc);
 
     state.pass_action.colors[0] = .{

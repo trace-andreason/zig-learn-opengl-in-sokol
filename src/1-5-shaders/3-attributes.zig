@@ -11,6 +11,7 @@ const state = struct {
     var bind: sg.Bindings = .{};
     var pip: sg.Pipeline = .{};
     var pass_action: sg.PassAction = .{};
+    var file_buffer = [1024 * 1024 * 4]u32;
 };
 
 export fn init() void {
@@ -19,8 +20,11 @@ export fn init() void {
         .logger = .{ .func = slog.func },
     });
 
+    sapp
+        .
+
     // initialize sokol_time
-    stime.stm_setup();
+        stime.stm_setup();
 
     state.bind.vertex_buffers[0] = sg.makeBuffer(.{ .data = sg.asRange(&[_]f32{ 0.5, -0.5, 0.0, 1.0, 0.0, 0.0, -0.5, -0.5, 0, 0.0, 1.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 1.0 }) });
 
