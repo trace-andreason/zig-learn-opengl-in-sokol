@@ -23,32 +23,7 @@ export fn init() void {
         .logger = .{ .func = slog.func },
     });
 
-    //const allocator = std.heap.page_allocator();
-
-    // Specify the path to your JPEG file
-    const img_path = "./src/data/container.jpg";
-
-    // Load the image
-    var x: c_int = 0;
-    var y: c_int = 0;
-    var channels_in_file: c_int = 0;
-
-    const data = c.stbi_load(img_path, &x, &y, &channels_in_file, 4);
-    if (data == null) {
-        std.log.err("Failed to load image", .{});
-        return;
-    }
-    defer c.stbi_image_free(data);
-    const width: usize = @intCast(x);
-    const height: usize = @intCast(y);
-    const img_size = width * height * 4; // 3 for RGB
-
-    var img_desc: sg.ImageDesc = .{ .width = x, .height = y, .pixel_format = .RGBA8 };
-    img_desc.data.subimage[0][0] = .{
-        .ptr = data,
-        .size = img_size,
-    };
-    state.bind.fs.images[shd.SLOT__ourTexture] = sg.makeImage(img_desc);
+    loadImage("./src/data/container.jpg");
 
     //sg.initImage(state.bind.fs.images[shd.SLOT__ourTexture], img_desc);
     state.bind.fs.samplers[shd.SLOT_ourTexture_smp] = sg.makeSampler(.{});
@@ -78,6 +53,29 @@ export fn init() void {
     };
 
     print("Backend {}\n", .{sg.queryBackend()});
+}
+
+fn loadImage(path: [*c]const u8) void {
+    // Load the image
+    var x: c_int = 0;
+    var y: c_int = 0;
+    var channels_in_file: c_int = 0;
+    const data = c.stbi_load(path, &x, &y, &channels_in_file, 4);
+    if (data == null) {
+        std.log.err("Failed to load image", .{});
+        return;
+    }
+    defer c.stbi_image_free(data);
+    const width: usize = @intCast(x);
+    const height: usize = @intCast(y);
+    const img_size = width * height * 4; // 3 for RGB
+
+    var img_desc: sg.ImageDesc = .{ .width = x, .height = y, .pixel_format = .RGBA8 };
+    img_desc.data.subimage[0][0] = .{
+        .ptr = data,
+        .size = img_size,
+    };
+    state.bind.fs.images[shd.SLOT__ourTexture] = sg.makeImage(img_desc);
 }
 
 export fn frame() void {
