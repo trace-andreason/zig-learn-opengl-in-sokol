@@ -5,11 +5,10 @@ const sapp = sokol.app;
 const sglue = sokol.glue;
 const stime = sokol.time;
 const print = @import("std").debug.print;
-const shd = @import("1-texture.glsl.zig");
+const shd = @import("3-multiple-textures.glsl.zig");
 const std = @import("std");
 const c = @cImport({
-    @cInclude("stdio.h");
-    //@cInclude("stb_image.h");
+    @cInclude("stb_image.h");
 });
 
 const state = struct {
@@ -24,10 +23,14 @@ export fn init() void {
         .logger = .{ .func = slog.func },
     });
 
-    loadImage("./src/data/container.jpg");
+    // flip images vertically after loading
+    c.stbi_set_flip_vertically_on_load(1);
 
-    //sg.initImage(state.bind.fs.images[shd.SLOT__ourTexture], img_desc);
-    state.bind.fs.samplers[shd.SLOT_ourTexture_smp] = sg.makeSampler(.{});
+    loadImage("./src/data/container.jpg", shd.SLOT__texture1);
+    loadImage("./src/data/awesomeface.png", shd.SLOT__texture2);
+
+    state.bind.fs.samplers[shd.SLOT_texture1_smp] = sg.makeSampler(.{});
+    state.bind.fs.samplers[shd.SLOT_texture2_smp] = sg.makeSampler(.{});
     state.bind.vertex_buffers[0] = sg.makeBuffer(.{
         .data = sg.asRange(&[_]f32{
             // positions     //colors       //texture coordinates
@@ -56,7 +59,7 @@ export fn init() void {
     print("Backend {}\n", .{sg.queryBackend()});
 }
 
-fn loadImage(path: [*c]const u8) void {
+fn loadImage(path: [*c]const u8, shader_slot: u8) void {
     // Load the image
     var x: c_int = 0;
     var y: c_int = 0;
@@ -76,7 +79,7 @@ fn loadImage(path: [*c]const u8) void {
         .ptr = data,
         .size = img_size,
     };
-    state.bind.fs.images[shd.SLOT__ourTexture] = sg.makeImage(img_desc);
+    state.bind.fs.images[shader_slot] = sg.makeImage(img_desc);
 }
 
 export fn frame() void {

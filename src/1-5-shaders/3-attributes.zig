@@ -20,11 +20,8 @@ export fn init() void {
         .logger = .{ .func = slog.func },
     });
 
-    sapp
-        .
-
     // initialize sokol_time
-        stime.stm_setup();
+    stime.stm_setup();
 
     state.bind.vertex_buffers[0] = sg.makeBuffer(.{ .data = sg.asRange(&[_]f32{ 0.5, -0.5, 0.0, 1.0, 0.0, 0.0, -0.5, -0.5, 0, 0.0, 1.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 1.0 }) });
 

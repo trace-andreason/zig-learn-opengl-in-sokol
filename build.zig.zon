@@ -19,6 +19,11 @@
             .url = "git+https://github.com/floooh/sokol-zig.git#18f4f3d6188f4faff2fab6bd7f8abc58e6e26b04",
             .hash = "12204b76dc14c74da9d61d01b5bd7a4fbfd0614aa7cc0a7428de0742129203ca5008",
         },
+        .emsdk = .{
+            .url = "git+https://github.com/emscripten-core/emsdk#176dec4875db4d74c2038d7e8af3395be38d222c",
+            .hash = "122034cf4aca9f97fea3c34f3e9fe92e56f08e2160efe3c95d7ec89260e621426a81",
+        },
+
         // See `zig fetch --save <url>` for a command-line interface for adding dependencies.
         //.example = .{
         //    // When updating this field to a new URL, be sure to delete the corresponding
