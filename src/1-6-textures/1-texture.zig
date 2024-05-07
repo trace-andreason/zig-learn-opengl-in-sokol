@@ -8,8 +8,7 @@ const print = @import("std").debug.print;
 const shd = @import("1-texture.glsl.zig");
 const std = @import("std");
 const c = @cImport({
-    @cInclude("stdio.h");
-    //@cInclude("stb_image.h");
+    @cInclude("stb_image.h");
 });
 
 const state = struct {
