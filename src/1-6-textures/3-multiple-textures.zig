@@ -11,6 +11,9 @@ const c = @cImport({
     @cInclude("stb_image.h");
 });
 
+const containerImage = @embedFile("container.jpg");
+const awesomfaceImage = @embedFile("awesomeface.png");
+
 const state = struct {
     var bind: sg.Bindings = .{};
     var pip: sg.Pipeline = .{};
@@ -26,8 +29,8 @@ export fn init() void {
     // flip images vertically after loading
     c.stbi_set_flip_vertically_on_load(1);
 
-    loadImage("./src/data/container.jpg", shd.SLOT__texture1);
-    loadImage("./src/data/awesomeface.png", shd.SLOT__texture2);
+    loadImage(containerImage.ptr, containerImage.len, shd.SLOT__texture1);
+    loadImage(awesomfaceImage.ptr, awesomfaceImage.len, shd.SLOT__texture2);
 
     state.bind.fs.samplers[shd.SLOT_texture1_smp] = sg.makeSampler(.{});
     state.bind.fs.samplers[shd.SLOT_texture2_smp] = sg.makeSampler(.{});
@@ -59,12 +62,13 @@ export fn init() void {
     print("Backend {}\n", .{sg.queryBackend()});
 }
 
-fn loadImage(path: [*c]const u8, shader_slot: u8) void {
+fn loadImage(image: [*:0]const u8, len: c_int, shader_slot: u8) void {
     // Load the image
     var x: c_int = 0;
     var y: c_int = 0;
     var channels_in_file: c_int = 0;
-    const data = c.stbi_load(path, &x, &y, &channels_in_file, 4);
+
+    const data = c.stbi_load_from_memory(image, len, &x, &y, &channels_in_file, 4);
     if (data == null) {
         std.log.err("Failed to load image", .{});
         return;

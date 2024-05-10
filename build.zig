@@ -80,19 +80,26 @@ fn buildExample(b: *Build, comptime conf: exampleBuildConfig, target: ResolvedTa
             .optimize = optimize,
             .link_libc = true,
         });
-        //example.linkLibC();
-        //example.addIncludePath(.{
-        //    .path = "src/",
-        //});
+        example.addIncludePath(.{
+            .path = "src/",
+        });
+        example.addIncludePath(.{
+            .path = "src/data",
+        });
 
-        //example.addCSourceFile(.{
-        //    .file = .{
-        //        .path = "src/stb_image.c",
-        //    },
-        //});
+        example.addCSourceFile(.{
+            .file = .{
+                .path = "src/stb_image.c",
+            },
+        });
+        const emsdk = dep_sokol.builder.dependency("emsdk", .{});
+        const emsdk_path = emsdk.path("").getPath(b);
+        const emsdk_sysroot = b.pathJoin(&.{ emsdk_path, "upstream", "emscripten", "cache", "sysroot" });
+        const include_path = b.pathJoin(&.{ emsdk_sysroot, "include" });
+        example.addSystemIncludePath(.{ .path = include_path });
+
         example.root_module.addImport("sokol", dep_sokol.module("sokol"));
 
-        const emsdk = dep_sokol.builder.dependency("emsdk", .{});
         const link_step = try sokol.emLinkStep(b, .{
             .lib_main = example,
             .target = target,

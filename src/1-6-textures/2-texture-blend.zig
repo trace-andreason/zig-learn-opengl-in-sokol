@@ -11,6 +11,8 @@ const c = @cImport({
     @cInclude("stb_image.h");
 });
 
+const containerImage = @embedFile("container.jpg");
+
 const state = struct {
     var bind: sg.Bindings = .{};
     var pip: sg.Pipeline = .{};
@@ -23,7 +25,7 @@ export fn init() void {
         .logger = .{ .func = slog.func },
     });
 
-    loadImage("./src/data/container.jpg");
+    loadImage(containerImage.ptr, containerImage.len);
 
     //sg.initImage(state.bind.fs.images[shd.SLOT__ourTexture], img_desc);
     state.bind.fs.samplers[shd.SLOT_ourTexture_smp] = sg.makeSampler(.{});
@@ -55,12 +57,13 @@ export fn init() void {
     print("Backend {}\n", .{sg.queryBackend()});
 }
 
-fn loadImage(path: [*c]const u8) void {
+fn loadImage(image: [*:0]const u8, len: c_int) void {
     // Load the image
     var x: c_int = 0;
     var y: c_int = 0;
     var channels_in_file: c_int = 0;
-    const data = c.stbi_load(path, &x, &y, &channels_in_file, 4);
+
+    const data = c.stbi_load_from_memory(image, len, &x, &y, &channels_in_file, 4);
     if (data == null) {
         std.log.err("Failed to load image", .{});
         return;
