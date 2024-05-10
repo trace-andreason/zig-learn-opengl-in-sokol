@@ -10,7 +10,7 @@ pub fn build(b: *Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const examples: [8]exampleBuildConfig = .{ .{
+    const examples: [9]exampleBuildConfig = .{ .{
         .name = "in-out",
         .path = "src/1-5-shaders/1-in-out.zig",
     }, .{
@@ -34,6 +34,9 @@ pub fn build(b: *Build) !void {
     }, .{
         .name = "multiple-textures",
         .path = "src/1-6-textures/3-multiple-textures.zig",
+    }, .{
+        .name = "scale-rotate",
+        .path = "src/1-7-transformations/1-scale-rotate.zig",
     } };
 
     inline for (examples) |example| {
@@ -52,6 +55,7 @@ fn buildExample(b: *Build, comptime conf: exampleBuildConfig, target: ResolvedTa
         .target = target,
         .optimize = optimize,
     });
+    const math = b.addModule("math", .{ .root_source_file = .{ .path = "src/math.zig" } });
     if (!target.result.isWasm()) {
         const example = b.addExecutable(.{
             .name = conf.name,
@@ -60,14 +64,17 @@ fn buildExample(b: *Build, comptime conf: exampleBuildConfig, target: ResolvedTa
             .root_source_file = b.path(conf.path),
         });
         example.linkLibC();
+        example.addIncludePath(.{
+            .path = "src/",
+        });
+        example.addLibraryPath(.{ .path = "src/math.zig" });
+        //example.addPackagePath("math", "src/math.zig");
         example.addCSourceFile(.{
             .file = .{
                 .path = "src/stb_image.c",
             },
         });
-        example.addIncludePath(.{
-            .path = "src/",
-        });
+        example.root_module.addImport("math", math);
         example.root_module.addImport("sokol", dep_sokol.module("sokol"));
         b.installArtifact(example);
         run = b.addRunArtifact(example);
@@ -92,6 +99,7 @@ fn buildExample(b: *Build, comptime conf: exampleBuildConfig, target: ResolvedTa
                 .path = "src/stb_image.c",
             },
         });
+        example.root_module.addImport("math", math);
         const emsdk = dep_sokol.builder.dependency("emsdk", .{});
         const emsdk_path = emsdk.path("").getPath(b);
         const emsdk_sysroot = b.pathJoin(&.{ emsdk_path, "upstream", "emscripten", "cache", "sysroot" });
