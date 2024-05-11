@@ -5,7 +5,7 @@ const sapp = sokol.app;
 const sglue = sokol.glue;
 const stime = sokol.time;
 const print = @import("std").debug.print;
-const shd = @import("transformations.glsl.zig");
+const shd = @import("shaders.glsl.zig");
 const std = @import("std");
 const m = @import("math");
 const zalg = @import("zalgebra");
@@ -28,8 +28,6 @@ export fn init() void {
         .logger = .{ .func = slog.func },
     });
 
-    stime.setup();
-
     // flip images vertically after loading
     c.stbi_set_flip_vertically_on_load(1);
 
@@ -51,7 +49,7 @@ export fn init() void {
     state.bind.index_buffer = sg.makeBuffer(.{ .type = .INDEXBUFFER, .data = sg.asRange(&[_]u16{ 0, 1, 3, 1, 2, 3 }) });
 
     var pip_desc: sg.PipelineDesc = .{ .shader = sg.makeShader(shd.simpleShaderDesc(sg.queryBackend())) };
-    pip_desc.layout.attrs[shd.ATTR_vs_position].format = .FLOAT3;
+    pip_desc.layout.attrs[shd.ATTR_vs_aPos].format = .FLOAT3;
     pip_desc.layout.attrs[shd.ATTR_vs_aTexCoord].format = .FLOAT2;
     pip_desc.index_type = .UINT16;
 
@@ -90,13 +88,16 @@ fn loadImage(image: [*:0]const u8, len: c_int, shader_slot: u8) void {
 }
 
 export fn frame() void {
-    const rotate = zalg.Mat4.identity().rotate(@floatCast(stime.sec(stime.now())), zalg.Vec3.new(0.0, 0.0, 1.0));
-    const scale = rotate.translate(zalg.Vec3.new(0.5, -0.5, 0.0));
-
+    const model = zalg.Mat4.identity().rotate(-55, zalg.Vec3.new(1.0, 0.0, 0.0));
+    // note that we're translating the scene in the reverse direction of where we want to move
+    const view = zalg.Mat4.identity().translate(zalg.Vec3.new(0.0, 0.0, -3.0));
+    const width: f32 = @floatFromInt(sapp.width());
+    const height: f32 = @floatFromInt(sapp.height());
+    const projection = zalg.perspective(45, width / height, 0.5, 100.0);
     sg.beginPass(.{ .action = state.pass_action, .swapchain = sglue.swapchain() });
     sg.applyPipeline(state.pip);
     sg.applyBindings(state.bind);
-    const vs_params: shd.VsParams = .{ .transform = scale };
+    const vs_params: shd.VsParams = .{ .model = model, .view = view, .projection = projection };
     sg.applyUniforms(.VS, shd.SLOT_vs_params, sg.asRange(&vs_params));
     sg.draw(0, 6, 1);
     sg.endPass();

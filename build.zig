@@ -10,7 +10,7 @@ pub fn build(b: *Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const examples: [10]exampleBuildConfig = .{ .{
+    const examples: [11]exampleBuildConfig = .{ .{
         .name = "in-out",
         .path = "src/1-5-shaders/1-in-out.zig",
     }, .{
@@ -40,6 +40,9 @@ pub fn build(b: *Build) !void {
     }, .{
         .name = "rotate-translate",
         .path = "src/1-7-transformations/2-rotate-translate.zig",
+    }, .{
+        .name = "coordinate-plane",
+        .path = "src/1-8-coordinate-systems/1-plane.zig",
     } };
 
     inline for (examples) |example| {
