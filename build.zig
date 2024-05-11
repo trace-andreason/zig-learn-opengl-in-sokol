@@ -92,9 +92,6 @@ fn buildExample(b: *Build, comptime conf: exampleBuildConfig, target: ResolvedTa
         example.addIncludePath(.{
             .path = "src/",
         });
-        example.addIncludePath(.{
-            .path = "src/data",
-        });
 
         example.addCSourceFile(.{
             .file = .{
