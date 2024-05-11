@@ -10,7 +10,7 @@ pub fn build(b: *Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const examples: [12]exampleBuildConfig = .{
+    const examples: [13]exampleBuildConfig = .{
         .{
             .name = "in-out",
             .path = "src/1-5-shaders/1-in-out.zig",
@@ -58,6 +58,10 @@ pub fn build(b: *Build) !void {
         .{
             .name = "coordinate-cube",
             .path = "src/1-8-coordinate-systems/2-cube.zig",
+        },
+        .{
+            .name = "coordinate-more-cubes",
+            .path = "src/1-8-coordinate-systems/3-more-cubes.zig",
         },
     };
 
