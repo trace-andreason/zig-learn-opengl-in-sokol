@@ -10,40 +10,56 @@ pub fn build(b: *Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const examples: [11]exampleBuildConfig = .{ .{
-        .name = "in-out",
-        .path = "src/1-5-shaders/1-in-out.zig",
-    }, .{
-        .name = "uniforms",
-        .path = "src/1-5-shaders/2-uniforms.zig",
-    }, .{
-        .name = "attributes",
-        .path = "src/1-5-shaders/3-attributes.zig",
-    }, .{
-        .name = "triangle",
-        .path = "src/triangle.zig",
-    }, .{
-        .name = "hello",
-        .path = "src/hello.zig",
-    }, .{
-        .name = "texture",
-        .path = "src/1-6-textures/1-texture.zig",
-    }, .{
-        .name = "texture-blend",
-        .path = "src/1-6-textures/2-texture-blend.zig",
-    }, .{
-        .name = "multiple-textures",
-        .path = "src/1-6-textures/3-multiple-textures.zig",
-    }, .{
-        .name = "scale-rotate",
-        .path = "src/1-7-transformations/1-scale-rotate.zig",
-    }, .{
-        .name = "rotate-translate",
-        .path = "src/1-7-transformations/2-rotate-translate.zig",
-    }, .{
-        .name = "coordinate-plane",
-        .path = "src/1-8-coordinate-systems/1-plane.zig",
-    } };
+    const examples: [12]exampleBuildConfig = .{
+        .{
+            .name = "in-out",
+            .path = "src/1-5-shaders/1-in-out.zig",
+        },
+        .{
+            .name = "uniforms",
+            .path = "src/1-5-shaders/2-uniforms.zig",
+        },
+        .{
+            .name = "attributes",
+            .path = "src/1-5-shaders/3-attributes.zig",
+        },
+        .{
+            .name = "triangle",
+            .path = "src/triangle.zig",
+        },
+        .{
+            .name = "hello",
+            .path = "src/hello.zig",
+        },
+        .{
+            .name = "texture",
+            .path = "src/1-6-textures/1-texture.zig",
+        },
+        .{
+            .name = "texture-blend",
+            .path = "src/1-6-textures/2-texture-blend.zig",
+        },
+        .{
+            .name = "multiple-textures",
+            .path = "src/1-6-textures/3-multiple-textures.zig",
+        },
+        .{
+            .name = "scale-rotate",
+            .path = "src/1-7-transformations/1-scale-rotate.zig",
+        },
+        .{
+            .name = "rotate-translate",
+            .path = "src/1-7-transformations/2-rotate-translate.zig",
+        },
+        .{
+            .name = "coordinate-plane",
+            .path = "src/1-8-coordinate-systems/1-plane.zig",
+        },
+        .{
+            .name = "coordinate-cube",
+            .path = "src/1-8-coordinate-systems/2-cube.zig",
+        },
+    };
 
     inline for (examples) |example| {
         try buildExample(b, example, target, optimize);
@@ -62,7 +78,6 @@ fn buildExample(b: *Build, comptime conf: exampleBuildConfig, target: ResolvedTa
         .optimize = optimize,
     });
     const dep_zalgebra = b.dependency("zalgebra", .{ .target = target, .optimize = optimize });
-    const math = b.addModule("math", .{ .root_source_file = .{ .path = "src/math.zig" } });
     if (!target.result.isWasm()) {
         const example = b.addExecutable(.{
             .name = conf.name,
@@ -74,14 +89,11 @@ fn buildExample(b: *Build, comptime conf: exampleBuildConfig, target: ResolvedTa
         example.addIncludePath(.{
             .path = "src/",
         });
-        example.addLibraryPath(.{ .path = "src/math.zig" });
-        //example.addPackagePath("math", "src/math.zig");
         example.addCSourceFile(.{
             .file = .{
                 .path = "src/stb_image.c",
             },
         });
-        example.root_module.addImport("math", math);
         example.root_module.addImport("sokol", dep_sokol.module("sokol"));
         example.root_module.addImport("zalgebra", dep_zalgebra.module("zalgebra"));
         b.installArtifact(example);
@@ -104,7 +116,6 @@ fn buildExample(b: *Build, comptime conf: exampleBuildConfig, target: ResolvedTa
                 .path = "src/stb_image.c",
             },
         });
-        example.root_module.addImport("math", math);
         const emsdk = dep_sokol.builder.dependency("emsdk", .{});
         const emsdk_path = emsdk.path("").getPath(b);
         const emsdk_sysroot = b.pathJoin(&.{ emsdk_path, "upstream", "emscripten", "cache", "sysroot" });
