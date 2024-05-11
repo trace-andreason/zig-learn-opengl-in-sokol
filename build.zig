@@ -10,7 +10,7 @@ pub fn build(b: *Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const examples: [9]exampleBuildConfig = .{ .{
+    const examples: [10]exampleBuildConfig = .{ .{
         .name = "in-out",
         .path = "src/1-5-shaders/1-in-out.zig",
     }, .{
@@ -37,6 +37,9 @@ pub fn build(b: *Build) !void {
     }, .{
         .name = "scale-rotate",
         .path = "src/1-7-transformations/1-scale-rotate.zig",
+    }, .{
+        .name = "rotate-translate",
+        .path = "src/1-7-transformations/2-rotate-translate.zig",
     } };
 
     inline for (examples) |example| {
