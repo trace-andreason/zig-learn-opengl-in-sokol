@@ -8,6 +8,7 @@ const print = @import("std").debug.print;
 const shd = @import("transformations.glsl.zig");
 const std = @import("std");
 const m = @import("math");
+const zalg = @import("zalgebra");
 const c = @cImport({
     @cInclude("stb_image.h");
 });
@@ -87,14 +88,13 @@ fn loadImage(image: [*:0]const u8, len: c_int, shader_slot: u8) void {
 }
 
 export fn frame() void {
-    const rotate: m.Mat4 = m.Mat4.rotate(90, .{ .x = 0.0, .y = 0.0, .z = 1.0 });
-    //const scale: m.Mat4 = m.scale(m.V3(0.5, 0.5, 0.5));
-    //const trans: m.Mat4 = m.MulM4(rotate, scale);
+    const rotate = zalg.Mat4.identity().rotate(90, zalg.Vec3.new(0.0, 0.0, 1.0));
+    const scale = rotate.scale(zalg.Vec3.new(0.5, 0.5, 0.5));
 
     sg.beginPass(.{ .action = state.pass_action, .swapchain = sglue.swapchain() });
     sg.applyPipeline(state.pip);
     sg.applyBindings(state.bind);
-    const vs_params: shd.VsParams = .{ .transform = rotate };
+    const vs_params: shd.VsParams = .{ .transform = scale };
     sg.applyUniforms(.VS, shd.SLOT_vs_params, sg.asRange(&vs_params));
     sg.draw(0, 6, 1);
     sg.endPass();

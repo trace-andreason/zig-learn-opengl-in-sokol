@@ -19,6 +19,10 @@
             .url = "git+https://github.com/floooh/sokol-zig.git#18f4f3d6188f4faff2fab6bd7f8abc58e6e26b04",
             .hash = "12204b76dc14c74da9d61d01b5bd7a4fbfd0614aa7cc0a7428de0742129203ca5008",
         },
+        .zalgebra = .{
+            .url = "git+https://github.com/kooparse/zalgebra.git#1ab7f25cd3f947289e98a617ae785607bbc5054e",
+            .hash = "1220665cd38b7e9625ddfe7cedde962586ceadf12ce8dd46acc5273c2d17fbf6afd7",
+        },
 
         // See `zig fetch --save <url>` for a command-line interface for adding dependencies.
         //.example = .{

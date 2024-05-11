@@ -55,6 +55,7 @@ fn buildExample(b: *Build, comptime conf: exampleBuildConfig, target: ResolvedTa
         .target = target,
         .optimize = optimize,
     });
+    const dep_zalgebra = b.dependency("zalgebra", .{ .target = target, .optimize = optimize });
     const math = b.addModule("math", .{ .root_source_file = .{ .path = "src/math.zig" } });
     if (!target.result.isWasm()) {
         const example = b.addExecutable(.{
@@ -76,6 +77,7 @@ fn buildExample(b: *Build, comptime conf: exampleBuildConfig, target: ResolvedTa
         });
         example.root_module.addImport("math", math);
         example.root_module.addImport("sokol", dep_sokol.module("sokol"));
+        example.root_module.addImport("zalgebra", dep_zalgebra.module("zalgebra"));
         b.installArtifact(example);
         run = b.addRunArtifact(example);
     } else {
@@ -107,6 +109,7 @@ fn buildExample(b: *Build, comptime conf: exampleBuildConfig, target: ResolvedTa
         example.addSystemIncludePath(.{ .path = include_path });
 
         example.root_module.addImport("sokol", dep_sokol.module("sokol"));
+        example.root_module.addImport("zalgebra", dep_zalgebra.module("zalgebra"));
 
         const link_step = try sokol.emLinkStep(b, .{
             .lib_main = example,

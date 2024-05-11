@@ -1,5 +1,5 @@
 const sg = @import("sokol").gfx;
-const m = @import("math");
+const zalg = @import("zalgebra");
 
 //
 //  #version:1# (machine generated, don't edit!)
@@ -52,7 +52,7 @@ pub const SLOT_texture1_smp = 0;
 pub const SLOT_texture2_smp = 1;
 pub const SLOT_vs_params = 0;
 pub const VsParams = extern struct {
-    transform: m.Mat4 align(16),
+    transform: zalg.Mat4 align(16),
 };
 //
 // #version 330
