@@ -7,7 +7,7 @@ const stime = sokol.time;
 const print = @import("std").debug.print;
 const shd = @import("shaders.glsl.zig");
 const std = @import("std");
-const m = @import("math");
+const m = std.math;
 const zalg = @import("zalgebra");
 const c = @cImport({
     @cInclude("stb_image.h");
@@ -140,8 +140,11 @@ fn loadImage(image: [*:0]const u8, len: c_int, shader_slot: u8) void {
 }
 
 export fn frame() void {
-    // note that we're translating the scene in the reverse direction of where we want to move
-    const view = zalg.Mat4.identity().translate(zalg.Vec3.new(0.0, 0.0, -3.0));
+    const radius: f32 = 10.0;
+
+    const camX = m.sin(@as(f32, @floatCast(stime.sec(stime.now())))) * radius;
+    const camZ = m.cos(@as(f32, @floatCast(stime.sec(stime.now())))) * radius;
+    const view = zalg.lookAt(zalg.Vec3.new(camX, 0.0, camZ), zalg.Vec3.new(0.0, 0.0, 0.0), zalg.Vec3.new(0.0, 1.0, 0.0));
     const width: f32 = @floatFromInt(sapp.width());
     const height: f32 = @floatFromInt(sapp.height());
     const projection = zalg.perspective(45, width / height, 0.1, 100.0);

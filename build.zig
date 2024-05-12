@@ -10,60 +10,49 @@ pub fn build(b: *Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const examples: [13]exampleBuildConfig = .{
-        .{
-            .name = "in-out",
-            .path = "src/1-5-shaders/1-in-out.zig",
-        },
-        .{
-            .name = "uniforms",
-            .path = "src/1-5-shaders/2-uniforms.zig",
-        },
-        .{
-            .name = "attributes",
-            .path = "src/1-5-shaders/3-attributes.zig",
-        },
-        .{
-            .name = "triangle",
-            .path = "src/triangle.zig",
-        },
-        .{
-            .name = "hello",
-            .path = "src/hello.zig",
-        },
-        .{
-            .name = "texture",
-            .path = "src/1-6-textures/1-texture.zig",
-        },
-        .{
-            .name = "texture-blend",
-            .path = "src/1-6-textures/2-texture-blend.zig",
-        },
-        .{
-            .name = "multiple-textures",
-            .path = "src/1-6-textures/3-multiple-textures.zig",
-        },
-        .{
-            .name = "scale-rotate",
-            .path = "src/1-7-transformations/1-scale-rotate.zig",
-        },
-        .{
-            .name = "rotate-translate",
-            .path = "src/1-7-transformations/2-rotate-translate.zig",
-        },
-        .{
-            .name = "coordinate-plane",
-            .path = "src/1-8-coordinate-systems/1-plane.zig",
-        },
-        .{
-            .name = "coordinate-cube",
-            .path = "src/1-8-coordinate-systems/2-cube.zig",
-        },
-        .{
-            .name = "coordinate-more-cubes",
-            .path = "src/1-8-coordinate-systems/3-more-cubes.zig",
-        },
-    };
+    const examples: [14]exampleBuildConfig = .{ .{
+        .name = "in-out",
+        .path = "src/1-5-shaders/1-in-out.zig",
+    }, .{
+        .name = "uniforms",
+        .path = "src/1-5-shaders/2-uniforms.zig",
+    }, .{
+        .name = "attributes",
+        .path = "src/1-5-shaders/3-attributes.zig",
+    }, .{
+        .name = "triangle",
+        .path = "src/triangle.zig",
+    }, .{
+        .name = "hello",
+        .path = "src/hello.zig",
+    }, .{
+        .name = "texture",
+        .path = "src/1-6-textures/1-texture.zig",
+    }, .{
+        .name = "texture-blend",
+        .path = "src/1-6-textures/2-texture-blend.zig",
+    }, .{
+        .name = "multiple-textures",
+        .path = "src/1-6-textures/3-multiple-textures.zig",
+    }, .{
+        .name = "scale-rotate",
+        .path = "src/1-7-transformations/1-scale-rotate.zig",
+    }, .{
+        .name = "rotate-translate",
+        .path = "src/1-7-transformations/2-rotate-translate.zig",
+    }, .{
+        .name = "coordinate-plane",
+        .path = "src/1-8-coordinate-systems/1-plane.zig",
+    }, .{
+        .name = "coordinate-cube",
+        .path = "src/1-8-coordinate-systems/2-cube.zig",
+    }, .{
+        .name = "coordinate-more-cubes",
+        .path = "src/1-8-coordinate-systems/3-more-cubes.zig",
+    }, .{
+        .name = "camera-lookat",
+        .path = "src/1-9-camera/1-lookat.zig",
+    } };
 
     inline for (examples) |example| {
         try buildExample(b, example, target, optimize);
